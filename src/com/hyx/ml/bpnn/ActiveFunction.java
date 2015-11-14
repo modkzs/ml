@@ -1,4 +1,4 @@
-package com.hyx.ml;
+package com.hyx.ml.bpnn;
 
 /**
  * Created by yixuanhe on 11/13/15.

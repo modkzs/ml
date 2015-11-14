@@ -1,4 +1,4 @@
-package com.hyx.ml;
+package com.hyx.ml.bpnn;
 
 import java.util.ArrayList;
 import java.util.List;
