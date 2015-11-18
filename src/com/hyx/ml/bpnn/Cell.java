@@ -29,12 +29,12 @@ public class Cell {
         this.rate = rate;
         this.threshold = threshold;
 
-        weight = new double[length];
+        weight = new double[length+1];
 
         for (int i = 0; i < length; i++){
             Random rand = new Random();
-            // weight[i] in [-1.0 to 1.0]
-            weight[i] = rand.nextDouble()*2-1.0;
+            // weight[i] in [-0.2 to 0.2]
+            weight[i] = (rand.nextDouble()*2-1.0)/5;
             //weight[i] = rand.nextDouble()*10;
         }
     }

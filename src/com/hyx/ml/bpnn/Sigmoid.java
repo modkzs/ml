@@ -8,10 +8,11 @@ public class Sigmoid implements ActiveFunction {
     @Override
     public double active(double[] x, double[] weight) {
         double input = 0;
-        int len = weight.length;
+        int len = x.length;
         for (int i = 0; i < len; i++) {
             input += x[i]*weight[i];
         }
+        input += weight[len];
 
         return 1.0/(1 + Math.exp(-input));
     }

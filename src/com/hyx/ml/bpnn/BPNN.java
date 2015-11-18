@@ -33,20 +33,57 @@ public class BPNN {
     // the input value
     double[] input;
 
+    //the gradient in last epoch, used to speed up gd
+    double[][] o2hgradient;
+    double[][] h2igradient;
+
+    //some parameters in bpnn
+    private static double RATE = 0.25;
+    private static double THRESHOLD = 0.5;
+    private static double MONENTUM = 0.05;
+
+    //the error threshold where whole alg stop
+    private static double ERR = 0.000000001;
+    private static double LOSS = 0.00001;
+    // the processed data number in a batch process
+    private final static int STEP = 15;
+
+    //the momentum factor
+    double momentum;
+
     /*
      * input_number : the number of input feature
      * hidden_number : the number of cells in hidden layers
      * output_number : the number of output
      * active : the active function
      * rate : the learning rate
+     * threshold : the threshold using to judge whether a cell is active
+     * momentum : momentum factor
      */
-    public BPNN(int inputNumber, int hiddenNumber, int outputNumber, ActiveFunction active, double rate, double threshold){
+    public BPNN(int inputNumber, int hiddenNumber, int outputNumber, ActiveFunction active, double rate, double threshold, double momentum){
         this.hiddenLayer = new Layer(hiddenNumber, inputNumber, active, rate, threshold);
         this.outputLayer = new Layer(outputNumber, hiddenNumber, active, rate, threshold);
         this.outputNumber = outputNumber;
         this.hiddenNumber = hiddenNumber;
         this.inputNumber = inputNumber;
         this.active = active;
+        this.momentum = momentum;
+
+        this.o2hgradient = new double[inputNumber][hiddenNumber+1];
+        this.h2igradient = new double[hiddenNumber][inputNumber+1];
+    }
+
+    public BPNN(int inputNumber, int hiddenNumber, int outputNumber, ActiveFunction active){
+        this.hiddenLayer = new Layer(hiddenNumber, inputNumber, active, RATE, THRESHOLD);
+        this.outputLayer = new Layer(outputNumber, hiddenNumber, active, RATE, THRESHOLD);
+        this.outputNumber = outputNumber;
+        this.hiddenNumber = hiddenNumber;
+        this.inputNumber = inputNumber;
+        this.active = active;
+        this.momentum = MONENTUM;
+
+        this.o2hgradient = new double[inputNumber][hiddenNumber+1];
+        this.h2igradient = new double[hiddenNumber][inputNumber+1];
     }
 
     public boolean[] predict(double[] value){
@@ -64,38 +101,55 @@ public class BPNN {
         return hiddenOutput;
     }
 
-    public double update(double[] value, double[] tag, boolean flag){
+    /*
+     * This method is used for autoEncoder, which should not be used in other place
+     */
+    public double[] getHiddenOutput(double[] value){
         getOutput(value);
-
-        double[] err = new double[1];
-        err[0] = 0;
-
-        double[] val = new double[hiddenNumber];
-        double[][] O2HGradient = getOutputToHiddenGradient(tag, err, val);
-        double[][] H2IGradient = getHiddenToInputGradient(tag, err, val);
-
-        outputLayer.update(O2HGradient);
-        hiddenLayer.update(H2IGradient);
-
-        if(flag) {
-            double start = loss(tag, hiddenOutput);
-            System.out.println("loss : " + start);
-        }
-
-        return err[0];
+        return hiddenOutput;
     }
 
-    public double[][] getOutputToHiddenGradient(double[] tag, double[] err, double[] val){
-        double[][] gradient = new double[outputNumber][hiddenNumber];
+    public double[] update(double[][] values, double[][] tags, int STEP){
+        int length = values.length;
+        double[][] O2HGradient = new double[inputNumber][hiddenNumber+1];
+        double[][] H2IGradient = new double[hiddenNumber][inputNumber+1];
 
-        for (int i = 0; i < hiddenNumber; i++){
+        double[] err = new double[1];
+        double start = 0;
+        for(int i = 0; i < length; i++) {
+            double[] value = values[i];
+            double[] tag = tags[i];
+
+            getOutput(value);
+
+            double[] val = new double[hiddenNumber + 1];
+            getOutputToHiddenGradient(tag, err, val, O2HGradient);
+            getHiddenToInputGradient(tag, err, val, H2IGradient);
+
+            this.o2hgradient = O2HGradient;
+            this.h2igradient = H2IGradient;
+
+            outputLayer.update(O2HGradient);
+            hiddenLayer.update(H2IGradient);
+
+
+            start += loss(tag, hiddenOutput);
+        }
+
+        double[] result = new double[2];
+        result[0] = err[0];result[1] = start;
+        return result;
+    }
+
+    public void getOutputToHiddenGradient(double[] tag, double[] err, double[] val, double[][] gradient){
+        for (int i = 0; i <= hiddenNumber; i++){
             val[i] = 0;
         }
 
         for(int i = 0; i < outputNumber; i++){
+            double delta = active.derivative(outputLayer.getWeight(i), inputOutput) * (tag[i] - hiddenOutput[i]);
             for (int j = 0; j < hiddenNumber; j++) {
-                double delta = active.derivative(outputLayer.getWeight(i), inputOutput) * (tag[i] - hiddenOutput[i]);
-                gradient[i][j] = delta * inputOutput[j];
+                gradient[i][j] += momentum * delta * inputOutput[j] + (1-momentum) * o2hgradient[i][j];
 
                 /*
                  * this code is used to test whether the gradient is right and should not appear when you use it
@@ -112,21 +166,18 @@ public class BPNN {
 
                 err[0] += Math.abs(gradient[i][j]);
                 val[j] += delta*outputLayer.getWeight(i)[j];
-             }
-         }
-
-        return gradient;
+            }
+            gradient[i][hiddenNumber] += delta;
+        }
     }
 
-    public double[][] getHiddenToInputGradient(double[] tag, double[] err, double[] val){
-        double[][] gradient = new double[hiddenNumber][inputNumber];
-
+    public void getHiddenToInputGradient(double[] tag, double[] err, double[] val, double[][] gradient){
         for (int i = 0; i < hiddenNumber; i++){
+            double delta = val[i] * active.derivative(hiddenLayer.getWeight(i), input);
             for (int j = 0; j < inputNumber; j++){
-                double delta = val[i] * active.derivative(hiddenLayer.getWeight(i), input);
-                gradient[i][j] = delta*input[j];
+                gradient[i][j] += momentum * delta * input[j] + (1-momentum) * h2igradient[i][j];
 
-                 /*
+                /*
                  * this code is used to test whether the gradient is right and should not appear when you use it
 
                 double start = loss(tag, hiddenOutput);
@@ -142,9 +193,8 @@ public class BPNN {
 
                 err[0] += Math.abs(gradient[i][j]);
             }
+            gradient[i][inputNumber] += delta;
         }
-
-        return gradient;
     }
 
     public double loss(double[] tag, double[] v){
@@ -158,15 +208,30 @@ public class BPNN {
     }
 
     public void train(double[][] X, double[][] Y){
-        double err = 1;
+        double[] data;
         int length = X.length;
-        while (err != 0){
+        while (true){
             boolean flag = false;
-            for (int i = 0; i < length; i++){
-                err = update(X[i], Y[i], i==0);
-                if (i == 0)
-                    System.out.println("error : " + err);
-                if (err < 0.001){
+            for (int i = 0; i < length; i+=STEP){
+                int len;
+                if (i + STEP <= length)
+                    len = STEP;
+                else
+                    len = length - i;
+
+                double[][] train_X = new double[len][inputNumber];
+                double[][] train_Y = new double[len][outputNumber];
+                for (int j = 0; j < len; j++){
+                    train_X[j] = X[i+j];
+                    train_Y[j] = Y[i+j];
+                }
+                data = update(train_X, train_Y, len);
+
+                if (i == 0) {
+                    System.out.println(i + "th error : " + data[0]);
+                    System.out.println(i + "th loss : " + data[1]);
+                }
+                if (data[0] < ERR*len && data[1] < LOSS*len){
                     flag = true;
                     break;
                 }
@@ -178,7 +243,7 @@ public class BPNN {
 
     public static void main(String[] args){
         Sigmoid sigmoid = new Sigmoid();
-        BPNN bp = new BPNN(32, 15, 4, sigmoid, 0.25, 0.5);
+        BPNN bp = new BPNN(32, 15, 4, sigmoid, 1, 0.5, 0.05);
 
 
         Random random = new Random();
@@ -199,8 +264,6 @@ public class BPNN {
                 Y[i][j] = random.nextInt(4);
             }
         }
-
-
 
         bp.train(X, Y);
 
