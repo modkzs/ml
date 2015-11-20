@@ -147,11 +147,11 @@ public class BPNN {
 
         double mc = momentum;
 
-        if (start > 1.04 * loss)
-            mc = 0;
-        else if (start < loss){
-            mc = 0.95;
-        }
+//        if (start > 1.04 * loss)
+//            mc = 0;
+//        else if (start < loss){
+//            mc = 0.95;
+//        }
 
 
         for (int m = 0; m < outputNumber; m++){

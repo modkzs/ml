@@ -11,7 +11,7 @@ public class DataReader {
     public static Data dataRead(String fileName, int num) throws IOException {
         BufferedReader in=new BufferedReader(new FileReader(fileName));
 
-        double[][] X = new double[num][300];
+        double[][] X = new double[num][100];
         double[][] Y = new double[num][1];
 
         String line;
@@ -25,6 +25,7 @@ public class DataReader {
             }
 
             Y[n][0] = Double.parseDouble(feature[len-1]);
+            n++;
         }
         in.close();
 
@@ -47,11 +48,14 @@ public class DataReader {
                 X[n][i] = Double.parseDouble(feature[i]);
             }
 
-            Y[n][0] = Integer.parseInt(feature[len-1]);
+            Y[n][0] = Integer.parseInt(feature[len - 1]);
             n += 1;
         }
         in.close();
 
         return new Data2(X, Y);
+    }
+
+    public static void main(String[] args){
     }
 }

@@ -12,10 +12,10 @@ import java.io.IOException;
 public class SpamFilter {
     public BPNN bpnn;
 
-    static int HIDDEN_NUMBER = 400;
+    static int HIDDEN_NUMBER = 50;
 
     public SpamFilter(int featureLen){
-        bpnn = new BPNN(featureLen, HIDDEN_NUMBER, 1, new Sigmoid(), 1, 0.5, 0.9);
+        bpnn = new BPNN(featureLen, HIDDEN_NUMBER, 1, new Sigmoid(), 0.25, 0.5, 0);
     }
 
     public void train(double[][] wordBag, double[][] tag){
@@ -30,8 +30,8 @@ public class SpamFilter {
     public static void main(String[] args) throws IOException {
         FeatureExtracter fe = new FeatureExtracter();
 
-        int featureNum = 300;
-        Data data = DataReader.dataRead("data/sample_train_300_file.csv", 80176);
+        int featureNum = 100;
+        Data data = DataReader.dataRead("data/sample_train_100_file.csv", 80136);
         double[][] X = data.X;
         double[][] Y = data.Y;
 

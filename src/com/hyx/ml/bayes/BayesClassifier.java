@@ -69,12 +69,18 @@ public class BayesClassifier {
         int len = X.length;
 
         double prob[] = new double[number];
-        for (int i = 0; i < number; i++)
-            prob[i] = 1;
+        for (int i = 0; i < number; i++) {
+            if (totalItemNum[i] != 0)
+                prob[i] = totalItemNum[i];
+            else
+                prob[i] = 1;
+        }
 
         for (int i = 0; i < len; i++){
-            for (int j = 0; j < number; j++)
-                prob[j] = prob[j] * X[i] * itemProb[j].get(i);
+            for (int j = 0; j < number; j++) {
+                if (X[i] != 0)
+                    prob[j] = prob[j] * itemProb[j].get(i);
+            }
         }
 
         int result = 0;
@@ -109,7 +115,6 @@ public class BayesClassifier {
         Data2 data = DataReader.intDataRead("data/sample_train_300_file.csv", 80176);
         BayesClassifier bayes = new BayesClassifier(2);
         bayes.train(data.X, data.Y);
-        //data = DataReader.intDataRead("data/sample_test_100_file.csv", 20088);
         int[][] result = bayes.test(data.X, data.Y);
 
         for (int[] rs : result){
