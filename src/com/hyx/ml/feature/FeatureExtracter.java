@@ -19,7 +19,6 @@ public class FeatureExtracter {
 
     public int featureExtract(String fileName) throws IOException {
         BufferedReader in=new BufferedReader(new FileReader(fileName));
-        Set<String> wordBag = new HashSet<>();
 
         String line;
         while ((line = in.readLine()) != null){
@@ -60,14 +59,14 @@ public class FeatureExtracter {
 
             int n = word.length;
 
-            for (int k = 1; k < n; k++) {
-                for (int i = 0; i < featureNum; i++){
-                    if (word[k].equals(bag[i]))
+            for (int i = 0; i < featureNum; i++){
+                for (int j = 0; j < n; j++){
+                    if (bag[i].equals(word[j])){
                         tmpX[i] = 1;
-                    else
-                        tmpX[i] = 0;
+                    }
                 }
             }
+
             dataX.add(tmpX);
             dataY.add(tmpY);
             l+=1;
