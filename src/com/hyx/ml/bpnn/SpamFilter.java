@@ -15,7 +15,7 @@ public class SpamFilter {
     static int HIDDEN_NUMBER = 50;
 
     public SpamFilter(int featureLen){
-        bpnn = new BPNN(featureLen, HIDDEN_NUMBER, 1, new Sigmoid(), 0.25, 0.5, 0);
+        bpnn = new BPNN(featureLen, HIDDEN_NUMBER, 1, new Sigmoid(), 1, 0.5, 0.05);
     }
 
     public void train(double[][] wordBag, double[][] tag){
@@ -24,12 +24,10 @@ public class SpamFilter {
 
     public boolean predict(double[] text){
         double[] v = bpnn.getOutput(text);
-        return  (v[0] > 0.5);
+        return  (v[0] > 0.75);
     }
 
     public static void main(String[] args) throws IOException {
-        FeatureExtracter fe = new FeatureExtracter();
-
         int featureNum = 100;
         Data data = DataReader.dataRead("data/sample_train_100_file.csv", 80136);
         double[][] X = data.X;
@@ -37,10 +35,6 @@ public class SpamFilter {
 
         SpamFilter sf = new SpamFilter(featureNum);
         sf.train(X, Y);
-
-//        data = fe.getFeature("bayesian_test.txt", featureNum);
-//        X = data.X;
-//        Y = data.Y;
 
         int length = X.length;
 

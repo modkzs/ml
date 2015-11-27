@@ -58,7 +58,7 @@ public class BPNN {
      * the number of train data used in mini-batch gradient descent,
      * which is always set to 2 to 100
      */
-    private final static int STEP = 100;
+    private final static int STEP = 1;
     // the cycle times which each run mast have at least
     private final static int TIME = 5000;
 
@@ -156,16 +156,15 @@ public class BPNN {
 
         for (int m = 0; m < outputNumber; m++){
             for (int n = 0; n < hiddenNumber; n++){
-                O2HGradient[m][n] = (1-mc) * O2HGradient[m][n] + mc * o2hgradient[m][n];
-
                 result[0] += Math.abs(O2HGradient[m][n]);
+                O2HGradient[m][n] = (1-mc) * O2HGradient[m][n] + mc * o2hgradient[m][n];
             }
         }
 
         for (int m = 0; m < hiddenNumber; m++){
             for (int n = 0; n < inputNumber; n++){
-                H2IGradient[m][n] = (1-mc) * H2IGradient[m][n] + mc * h2igradient[m][n];
                 result[0] += Math.abs(H2IGradient[m][n]);
+                H2IGradient[m][n] = (1-mc) * H2IGradient[m][n] + mc * h2igradient[m][n];
             }
         }
 
@@ -194,6 +193,7 @@ public class BPNN {
                 /*
                  * this code is used to test whether the gradient is right and should not appear when you use it
 
+
                 double start = loss(tag, hiddenOutput);
                 double epsilon = 0.01;
                 outputLayer.addWeight(i, j, epsilon);
@@ -201,6 +201,7 @@ public class BPNN {
                 double test_g = (end - start)/epsilon;
                 outputLayer.minusWeight(i, j, epsilon);
 
+                /*
                  * test is over
                  */
 
@@ -252,7 +253,7 @@ public class BPNN {
 
         while (true){
             boolean flag = false;
-            for (int i = 0; i < length; i+=10){
+            for (int i = 0; i < length; i+=STEP){
 
                 int len;
                 if (i + STEP <= length)
@@ -264,15 +265,18 @@ public class BPNN {
 
                 double[][] train_X = new double[len][inputNumber];
                 double[][] train_Y = new double[len][outputNumber];
+                int spsm = 0;
                 for (int j = 0; j < len; j++){
                     train_X[j] = X[i+j];
                     train_Y[j] = Y[i+j];
+                    if (train_Y[j][0] == 1)
+                        spsm += 1;
                 }
                 data = update(train_X, train_Y, len);
 
                 if (i >= 0 ) {
                     System.out.println(i + "th error : " + data[0]);
-                    System.out.println(i + "th loss : " + data[1]);
+                    System.out.println(i + "th loss : " + data[1] + " " + spsm);
                 }
                 if (data[0] < ERR && times > TIME){
                     flag = true;

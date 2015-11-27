@@ -16,7 +16,7 @@ public class BPNNTest {
      */
     public static void main(String[] args) throws IOException {
         Sigmoid sigmoid = new Sigmoid();
-        BPNN bp = new BPNN(32, 15, 4, sigmoid, 0.25, 0.5, 1);
+        BPNN bp = new BPNN(32, 15, 4, sigmoid, 0.25, 0.5, 0);
 
         Random random = new Random();
         List<Integer> list = new ArrayList<Integer>();
