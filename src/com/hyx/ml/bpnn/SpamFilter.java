@@ -2,7 +2,6 @@ package com.hyx.ml.bpnn;
 
 import com.hyx.ml.feature.Data;
 import com.hyx.ml.feature.DataReader;
-import com.hyx.ml.feature.FeatureExtracter;
 
 import java.io.IOException;
 
@@ -12,7 +11,7 @@ import java.io.IOException;
 public class SpamFilter {
     public BPNN bpnn;
 
-    static int HIDDEN_NUMBER = 50;
+    static int HIDDEN_NUMBER = 150;
 
     public SpamFilter(int featureLen){
         bpnn = new BPNN(featureLen, HIDDEN_NUMBER, 1, new Sigmoid(), 1, 0.5, 0.05);
@@ -24,7 +23,7 @@ public class SpamFilter {
 
     public boolean predict(double[] text){
         double[] v = bpnn.getOutput(text);
-        return  (v[0] > 0.75);
+        return  (v[0] > 0.5);
     }
 
     public static void main(String[] args) throws IOException {
