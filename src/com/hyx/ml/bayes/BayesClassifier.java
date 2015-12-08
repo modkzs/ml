@@ -4,6 +4,7 @@ import com.hyx.ml.feature.Data2;
 import com.hyx.ml.feature.DataReader;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,25 +69,26 @@ public class BayesClassifier {
     public int predict(double[] X){
         int len = X.length;
 
-        double prob[] = new double[number];
+        BigDecimal  prob[] = new BigDecimal [number];
         for (int i = 0; i < number; i++) {
             if (totalItemNum[i] != 0)
-                prob[i] = totalItemNum[i];
+                prob[i] = new BigDecimal(totalItemNum[i]);
             else
-                prob[i] = 1;
+                prob[i] = new BigDecimal(1);
         }
+
 
         for (int i = 0; i < len; i++){
             for (int j = 0; j < number; j++) {
                 if (X[i] != 0)
-                    prob[j] = prob[j] * itemProb[j].get(i);
+                    prob[j] = prob[j].multiply(new BigDecimal(itemProb[j].get(i))).multiply(new BigDecimal(X[i]));
             }
         }
 
         int result = 0;
 
         for (int i = 1; i < number; i++){
-            if (prob[i] > prob[result])
+            if (prob[i].compareTo(prob[result]) > 0)
                 result = i;
         }
 
@@ -106,6 +108,8 @@ public class BayesClassifier {
         for (int i = 0; i < len; i++){
             int judge_Y  = predict(X[i]);
             result[Y[i][0]][judge_Y] += 1;
+            if(i%100 == 0)
+                System.out.println(i + "th finish!");
         }
 
         return result;

@@ -58,9 +58,7 @@ public class BPNN {
      * the number of train data used in mini-batch gradient descent,
      * which is always set to 2 to 100
      */
-    private final static int STEP = 1;
-    // the cycle times which each run mast have at least
-    private final static int TIME = 5000;
+    private int STEP = 1;
 
     //the momentum factor
     double momentum;
@@ -158,6 +156,7 @@ public class BPNN {
             for (int n = 0; n < hiddenNumber; n++){
                 result[0] += Math.abs(O2HGradient[m][n]);
                 O2HGradient[m][n] = (1-mc) * O2HGradient[m][n] + mc * o2hgradient[m][n];
+                O2HGradient[m][n] = O2HGradient[m][n]/STEP;
             }
         }
 
@@ -165,6 +164,7 @@ public class BPNN {
             for (int n = 0; n < inputNumber; n++){
                 result[0] += Math.abs(H2IGradient[m][n]);
                 H2IGradient[m][n] = (1-mc) * H2IGradient[m][n] + mc * h2igradient[m][n];
+                H2IGradient[m][n] = H2IGradient[m][n]/STEP;
             }
         }
 
@@ -261,7 +261,7 @@ public class BPNN {
                 else
                     len = length - i;
 
-                times += 10;
+                times += STEP;
 
                 double[][] train_X = new double[len][inputNumber];
                 double[][] train_Y = new double[len][outputNumber];
@@ -278,7 +278,7 @@ public class BPNN {
                     System.out.println(i + "th error : " + data[0]);
                     System.out.println(i + "th loss : " + data[1] + " " + spsm);
                 }
-                if (data[0] < ERR && times > TIME){
+                if (data[0] < ERR && times > length){
                     flag = true;
                     break;
                 }
@@ -286,5 +286,9 @@ public class BPNN {
             if (flag)
                 break;
         }
+    }
+
+    public void setStep(int step){
+        this.STEP = step;
     }
 }

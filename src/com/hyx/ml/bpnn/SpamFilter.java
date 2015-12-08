@@ -33,30 +33,50 @@ public class SpamFilter {
         double[][] Y = data.Y;
 
         SpamFilter sf = new SpamFilter(featureNum);
-        sf.train(X, Y);
+
 
         int length = X.length;
+        int train_len = 60000;
+
+        double[][] x_train = new double[train_len][100];
+        double[][] y_train = new double[train_len][100];
+        double[][] x_test = new double[length-train_len][100];
+        double[][] y_test = new double[length-train_len][100];
+
+        for(int i = 0; i < train_len; i++){
+            x_train[i] = X[i];
+            y_train[i] = Y[i];
+        }
+
+        for(int i = train_len; i < length; i++){
+            x_test[i-train_len] = X[i];
+            y_test[i-train_len] = Y[i];
+        }
+
+        sf.train(x_train, y_train);
+
 
         int TT = 0;
         int TF = 0;
         int FT = 0;
         int FF = 0;
 
-        int right = 0;
-        for (int i = 0; i < length; i++){
-            if (Y[i][0] == 0)
-                right++;
-        }
-        System.out.println(right);
+//        int right = 0;
+//        for (int i = 0; i < length; i++){
+//            if (Y[i][0] == 0)
+//                right++;
+//        }
+//        System.out.println(right);
 
+        length = x_test.length;
         for (int i = 0; i < length; i++){
-            if (sf.predict(X[i]) && Y[i][0] == 1){
+            if (sf.predict(x_test[i]) && y_test[i][0] == 1){
                 FF += 1;
             }
-            else  if (sf.predict(X[i]) && Y[i][0] == 0){
+            else  if (sf.predict(x_test[i]) && y_test[i][0] == 0){
                 FT += 1;
             }
-            else if (!sf.predict(X[i]) && Y[i][0] == 1){
+            else if (!sf.predict(x_test[i]) && y_test[i][0] == 1){
                 TF += 1;
             }
             else
@@ -67,5 +87,9 @@ public class SpamFilter {
         System.out.println("TF : " + TF);
         System.out.println("FT : " + FT);
         System.out.println("FF : " + FF);
+
+        double rate = 0.3*(0.65*TT/(TT+TF) + 0.35*TT/(TT+FT)) + 0.7*(0.65*FF/(FF+FT) + 0.35*FF/(FF+TF));
+        System.out.print("rate : " + rate);
+
     }
 }
