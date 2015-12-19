@@ -279,7 +279,7 @@ public class BPNN {
                     System.out.println(times + "th error : " + data[0]);
                     System.out.println(times + "th loss : " + data[1] + " " + spsm);
                 }
-                if (data[0] < ERR && times > 3*length){
+                if (data[0] < ERR && times > 5*length){
                     flag = true;
                     break;
                 }
