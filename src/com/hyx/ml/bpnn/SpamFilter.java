@@ -15,6 +15,7 @@ public class SpamFilter {
 
     public SpamFilter(int featureLen){
         bpnn = new BPNN(featureLen, HIDDEN_NUMBER, 1, new Sigmoid(), 1, 0.5, 0.05);
+        bpnn.setStep(100);
     }
 
     public void train(double[][] wordBag, double[][] tag){
@@ -27,8 +28,8 @@ public class SpamFilter {
     }
 
     public static void main(String[] args) throws IOException {
-        int featureNum = 100;
-        Data data = DataReader.dataRead("data/sample_train_100_file.csv", 80136);
+        int featureNum = 300;
+        Data data = DataReader.dataRead("data/sample_train_300_file.csv", 80176);
         double[][] X = data.X;
         double[][] Y = data.Y;
 

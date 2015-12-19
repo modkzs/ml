@@ -11,7 +11,7 @@ public class DataReader {
     public static Data dataRead(String fileName, int num) throws IOException {
         BufferedReader in=new BufferedReader(new FileReader(fileName));
 
-        double[][] X = new double[num][100];
+        double[][] X = new double[num][300];
         double[][] Y = new double[num][1];
 
         String line;

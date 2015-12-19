@@ -168,6 +168,8 @@ public class BPNN {
             }
         }
 
+        result[0] = result[0]/STEP;
+
         this.o2hgradient = O2HGradient;
         this.h2igradient = H2IGradient;
 
@@ -176,7 +178,7 @@ public class BPNN {
         hiddenLayer.update(H2IGradient);
 
 
-        result[1] = start;
+        result[1] = start/STEP;
         return result;
     }
 
@@ -237,12 +239,9 @@ public class BPNN {
 
     public double loss(double[] tag, double[] v){
         double result = 0;
-        int length = v.length;
-        for (int i = 0; i < length; i++){
-            result += (tag[i]-v[i])*(tag[i]-v[i]);
-        }
+        result = tag[0]*Math.log(v[0]) + (1-tag[0])*Math.log(1-v[0]);
 
-        return result/2;
+        return -result;
     }
 
     public void train(double[][] X, double[][] Y){
@@ -278,7 +277,7 @@ public class BPNN {
                     System.out.println(i + "th error : " + data[0]);
                     System.out.println(i + "th loss : " + data[1] + " " + spsm);
                 }
-                if (data[0] < ERR && times > length){
+                if (data[0] < ERR || times > 30*length){
                     flag = true;
                     break;
                 }
