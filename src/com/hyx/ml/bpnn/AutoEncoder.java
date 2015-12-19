@@ -16,7 +16,7 @@ public class AutoEncoder {
     public AutoEncoder(int inputLen, int codeLen){
         Sigmoid sigmoid = new Sigmoid();
 
-        this.bpnn = new BPNN(inputLen, codeLen, inputLen, sigmoid, 1, 0.5, 0);
+        this.bpnn = new BPNN(inputLen, codeLen, inputLen, sigmoid, 1, 0.5, 0, 0.95);
         this.inputLen = inputLen;
 
     }

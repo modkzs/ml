@@ -22,14 +22,14 @@ public class Layer {
      * active : the active function
      * rate : the learning rate
      */
-    public Layer(int number, int length, ActiveFunction active, double rate, double threshold){
+    public Layer(int number, int length, ActiveFunction active, double rate, double threshold, double xi){
         this.number = number;
         this.cells = new Cell[number];
         this.output = new double[number];
         this.isActive = new boolean[number];
 
         for (int i = 0; i < number; i++){
-            this.cells[i] = new Cell(active, length, rate, threshold);
+            this.cells[i] = new Cell(active, length, rate, threshold, xi);
         }
     }
 

@@ -21,13 +21,17 @@ public class Cell {
     // the length of weight
     int length;
 
+    // regularization parameter
+    double xi;
+
     ActiveFunction active;
 
-    public Cell(ActiveFunction active, int length, double rate, double threshold){
+    public Cell(ActiveFunction active, int length, double rate, double threshold, double xi){
         this.active = active;
         this.length = length;
         this.rate = rate;
         this.threshold = threshold;
+        this.xi = xi;
 
         weight = new double[length+1];
 
@@ -62,6 +66,7 @@ public class Cell {
     public void update(double[] gradient){
         for (int i = 0; i < length; i++){
             weight[i] = weight[i] + rate*gradient[i];
+            weight[i] = weight[i] * xi;
         }
     }
 

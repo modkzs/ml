@@ -45,6 +45,8 @@ public class BPNN {
     private static double THRESHOLD = 0.5;
     // the monentum factor
     private static double MONENTUM = 0.05;
+    // the regularization parameter
+    private static double XI = 0.95;
 
     //the error threshold where whole alg stop
     private static double ERR = 0.000000001;
@@ -72,9 +74,9 @@ public class BPNN {
      * threshold : the threshold using to judge whether a cell is active
      * momentum : momentum factor
      */
-    public BPNN(int inputNumber, int hiddenNumber, int outputNumber, ActiveFunction active, double rate, double threshold, double momentum){
-        this.hiddenLayer = new Layer(hiddenNumber, inputNumber, active, rate, threshold);
-        this.outputLayer = new Layer(outputNumber, hiddenNumber, active, rate, threshold);
+    public BPNN(int inputNumber, int hiddenNumber, int outputNumber, ActiveFunction active, double rate, double threshold, double momentum, double xi){
+        this.hiddenLayer = new Layer(hiddenNumber, inputNumber, active, rate, threshold, xi);
+        this.outputLayer = new Layer(outputNumber, hiddenNumber, active, rate, threshold, xi);
         this.outputNumber = outputNumber;
         this.hiddenNumber = hiddenNumber;
         this.inputNumber = inputNumber;
@@ -88,8 +90,8 @@ public class BPNN {
     }
 
     public BPNN(int inputNumber, int hiddenNumber, int outputNumber, ActiveFunction active){
-        this.hiddenLayer = new Layer(hiddenNumber, inputNumber, active, RATE, THRESHOLD);
-        this.outputLayer = new Layer(outputNumber, hiddenNumber, active, RATE, THRESHOLD);
+        this.hiddenLayer = new Layer(hiddenNumber, inputNumber, active, RATE, THRESHOLD, XI);
+        this.outputLayer = new Layer(outputNumber, hiddenNumber, active, RATE, THRESHOLD, XI);
         this.outputNumber = outputNumber;
         this.hiddenNumber = hiddenNumber;
         this.inputNumber = inputNumber;
@@ -274,10 +276,10 @@ public class BPNN {
                 data = update(train_X, train_Y, len);
 
                 if (i >= 0 ) {
-                    System.out.println(i + "th error : " + data[0]);
-                    System.out.println(i + "th loss : " + data[1] + " " + spsm);
+                    System.out.println(times + "th error : " + data[0]);
+                    System.out.println(times + "th loss : " + data[1] + " " + spsm);
                 }
-                if (data[0] < ERR || times > 30*length){
+                if (data[0] < ERR && times > 3*length){
                     flag = true;
                     break;
                 }

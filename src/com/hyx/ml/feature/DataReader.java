@@ -8,10 +8,10 @@ import java.io.IOException;
  * Created by yixuanhe on 11/20/15.
  */
 public class DataReader {
-    public static Data dataRead(String fileName, int num) throws IOException {
+    public static Data dataRead(String fileName, int num, int featurenum) throws IOException {
         BufferedReader in=new BufferedReader(new FileReader(fileName));
 
-        double[][] X = new double[num][300];
+        double[][] X = new double[num][featurenum];
         double[][] Y = new double[num][1];
 
         String line;

@@ -14,8 +14,8 @@ public class SpamFilter {
     static int HIDDEN_NUMBER = 150;
 
     public SpamFilter(int featureLen){
-        bpnn = new BPNN(featureLen, HIDDEN_NUMBER, 1, new Sigmoid(), 1, 0.5, 0.05);
-        bpnn.setStep(100);
+        bpnn = new BPNN(featureLen, HIDDEN_NUMBER, 1, new Sigmoid(), 1, 0.5, 0.05, 1);
+        bpnn.setStep(1);
     }
 
     public void train(double[][] wordBag, double[][] tag){
@@ -28,8 +28,8 @@ public class SpamFilter {
     }
 
     public static void main(String[] args) throws IOException {
-        int featureNum = 300;
-        Data data = DataReader.dataRead("data/sample_train_300_file.csv", 80176);
+        int featureNum = 100;
+        Data data = DataReader.dataRead("data/feature_train_100_filter.csv", 800000, featureNum);
         double[][] X = data.X;
         double[][] Y = data.Y;
 
@@ -37,12 +37,12 @@ public class SpamFilter {
 
 
         int length = X.length;
-        int train_len = 60000;
+        int train_len = 750000;
 
-        double[][] x_train = new double[train_len][100];
-        double[][] y_train = new double[train_len][100];
-        double[][] x_test = new double[length-train_len][100];
-        double[][] y_test = new double[length-train_len][100];
+        double[][] x_train = new double[train_len][featureNum];
+        double[][] y_train = new double[train_len][featureNum];
+        double[][] x_test = new double[length-train_len][featureNum];
+        double[][] y_test = new double[length-train_len][featureNum];
 
         for(int i = 0; i < train_len; i++){
             x_train[i] = X[i];
