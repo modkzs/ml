@@ -58,7 +58,7 @@ public class BPNN {
      * the number of train data used in mini-batch gradient descent,
      * which is always set to 2 to 100
      */
-    private int STEP = 1;
+    private int STEP = 100;
 
     //the momentum factor
     double momentum;
@@ -168,6 +168,8 @@ public class BPNN {
             }
         }
 
+        result[0] = result[0]/STEP;
+
         this.o2hgradient = O2HGradient;
         this.h2igradient = H2IGradient;
 
@@ -176,7 +178,7 @@ public class BPNN {
         hiddenLayer.update(H2IGradient);
 
 
-        result[1] = start;
+        result[1] = start/STEP;
         return result;
     }
 
@@ -276,9 +278,9 @@ public class BPNN {
 
                 if (i >= 0 ) {
                     System.out.println(i + "th error : " + data[0]);
-                    System.out.println(i + "th loss : " + data[1] + " " + spsm);
+                    System.out.println("        loss : " + data[1] + " " + spsm);
                 }
-                if (data[0] < ERR && times > length){
+                if (data[0] < ERR || times > 30*length){
                     flag = true;
                     break;
                 }
